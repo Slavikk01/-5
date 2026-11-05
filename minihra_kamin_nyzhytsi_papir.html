@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мінігра — Камінь, ножиці, папір</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0; min-height: 100vh; padding: 24px;
+        display: flex; align-items: center; justify-content: center;
+        font-family: Arial, sans-serif; color: #24304a;
+        background: linear-gradient(135deg, #e7f0ff, #f9eaff);
+    }
+    .card {
+        width: min(720px, 100%); padding: 30px; text-align: center;
+        background: white; border-radius: 22px;
+        box-shadow: 0 16px 45px rgba(40, 50, 80, .14);
+    }
+    h1 { margin-top: 0; }
+    .intro { color: #64708a; line-height: 1.5; }
+    .scoreboard {
+        display: flex; justify-content: center; gap: 14px;
+        flex-wrap: wrap; margin: 24px 0;
+    }
+    .score {
+        min-width: 130px; padding: 14px;
+        background: #f2f5fb; border-radius: 14px;
+    }
+    .score strong { display: block; margin-top: 5px; font-size: 28px; color: #385db0; }
+    .choices {
+        display: flex; justify-content: center; gap: 14px;
+        flex-wrap: wrap; margin: 24px 0;
+    }
+    .choice {
+        width: 135px; min-height: 120px; border: 2px solid #dce4f3;
+        border-radius: 16px; background: #fff; cursor: pointer;
+        font-size: 18px; font-weight: bold; color: #293955;
+        transition: transform .15s, border-color .15s, background .15s;
+    }
+    .choice span { display: block; font-size: 42px; margin-bottom: 8px; }
+    .choice:hover { transform: translateY(-4px); border-color: #6384d6; background: #f5f8ff; }
+    .choice:disabled { cursor: not-allowed; opacity: .6; }
+    .battle {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+        margin: 22px 0;
+    }
+    .fighter { padding: 18px 10px; border-radius: 14px; background: #f8f9fc; }
+    .fighter .emoji { font-size: 44px; display: block; margin-bottom: 6px; }
+    #result { min-height: 30px; font-size: 19px; font-weight: bold; color: #385db0; }
+    #details { min-height: 22px; color: #64708a; }
+    .reset {
+        border: 0; border-radius: 10px; padding: 12px 20px;
+        background: #385db0; color: white; font-size: 16px; cursor: pointer;
+    }
+    .reset:hover { background: #29488e; }
+    @media (max-width: 480px) {
+        .card { padding: 20px 14px; }
+        .choice { width: 105px; min-height: 105px; font-size: 15px; }
+        .choice span { font-size: 34px; }
+    }
+</style>
+</head>
+<body>
+<main class="card">
+    <h1>✊ Камінь, ножиці, папір ✋</h1>
+    <p class="intro">Зроби свій вибір, а комп’ютер випадково обере свій. Переможець раунду отримує бал!</p>
+
+    <section class="scoreboard">
+        <div class="score">Твої бали<strong id="playerScore">0</strong></div>
+        <div class="score">Комп’ютер<strong id="computerScore">0</strong></div>
+        <div class="score">Нічиї<strong id="drawScore">0</strong></div>
+    </section>
+
+    <h2>Обери хід</h2>
+    <div class="choices">
+        <button class="choice" data-choice="rock"><span>✊</span>Камінь</button>
+        <button class="choice" data-choice="paper"><span>✋</span>Папір</button>
+        <button class="choice" data-choice="scissors"><span>✌️</span>Ножиці</button>
+    </div>
+
+    <div class="battle">
+        <div class="fighter">
+            <span class="emoji" id="playerEmoji">❔</span>
+            <strong>Твій вибір</strong>
+        </div>
+        <div class="fighter">
+            <span class="emoji" id="computerEmoji">❔</span>
+            <strong>Вибір комп’ютера</strong>
+        </div>
+    </div>
+
+    <p id="result" role="status">Зроби перший хід!</p>
+    <p id="details">Гра триває, доки ти не вирішиш зупинитися.</p>
+    <button class="reset" id="resetButton">Скинути рахунок</button>
+</main>
+
+<script>
+    const options = {
+        rock: { name: "Камінь", emoji: "✊" },
+        paper: { name: "Папір", emoji: "✋" },
+        scissors: { name: "Ножиці", emoji: "✌️" }
+    };
+
+    let playerScore = 0;
+    let computerScore = 0;
+    let drawScore = 0;
+
+    const playerScoreText = document.getElementById("playerScore");
+    const computerScoreText = document.getElementById("computerScore");
+    const drawScoreText = document.getElementById("drawScore");
+    const playerEmoji = document.getElementById("playerEmoji");
+    const computerEmoji = document.getElementById("computerEmoji");
+    const result = document.getElementById("result");
+    const details = document.getElementById("details");
+
+    function play(playerChoice) {
+        const keys = Object.keys(options);
+        const computerChoice = keys[Math.floor(Math.random() * keys.length)];
+
+        playerEmoji.textContent = options[playerChoice].emoji;
+        computerEmoji.textContent = options[computerChoice].emoji;
+
+        if (playerChoice === computerChoice) {
+            drawScore++;
+            result.textContent = "Нічия!";
+            details.textContent = "Ви обоє обрали: " + options[playerChoice].name + ".";
+        } else if (
+            (playerChoice === "rock" && computerChoice === "scissors") ||
+            (playerChoice === "paper" && computerChoice === "rock") ||
+            (playerChoice === "scissors" && computerChoice === "paper")
+        ) {
+            playerScore++;
+            result.textContent = "Ти переміг у цьому раунді! 🎉";
+            details.textContent = options[playerChoice].name + " перемагає: " + options[computerChoice].name + ".";
+        } else {
+            computerScore++;
+            result.textContent = "Цього разу переміг комп’ютер.";
+            details.textContent = options[computerChoice].name + " перемагає: " + options[playerChoice].name + ".";
+        }
+
+        playerScoreText.textContent = playerScore;
+        computerScoreText.textContent = computerScore;
+        drawScoreText.textContent = drawScore;
+    }
+
+    document.querySelectorAll(".choice").forEach(function(button) {
+        button.addEventListener("click", function() {
+            play(button.dataset.choice);
+        });
+    });
+
+    document.getElementById("resetButton").addEventListener("click", function() {
+        playerScore = 0;
+        computerScore = 0;
+        drawScore = 0;
+        playerScoreText.textContent = "0";
+        computerScoreText.textContent = "0";
+        drawScoreText.textContent = "0";
+        playerEmoji.textContent = "❔";
+        computerEmoji.textContent = "❔";
+        result.textContent = "Рахунок скинуто!";
+        details.textContent = "Обери хід, щоб почати нову гру.";
+    });
+</script>
+</body>
+</html>
