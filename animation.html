@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анімація JavaScript</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #263b5e;
+        }
+
+        .animation-area {
+            width: 90%;
+            max-width: 700px;
+            height: 300px;
+            margin: 30px auto;
+            background-color: white;
+            border: 2px solid #263b5e;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .box {
+            width: 70px;
+            height: 70px;
+            position: absolute;
+            border-radius: 12px;
+            left: 20px;
+        }
+
+        #box1 {
+            background-color: #e74c3c;
+            top: 30px;
+        }
+
+        #box2 {
+            background-color: #3498db;
+            top: 120px;
+        }
+
+        #box3 {
+            background-color: #2ecc71;
+            top: 210px;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            background-color: #263b5e;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #426a9e;
+        }
+
+        #status {
+            font-size: 18px;
+            color: #263b5e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Анімація елементів за допомогою JavaScript</h1>
+
+    <p>Натискайте кнопки, щоб керувати рухом квадратів.</p>
+
+    <div class="animation-area">
+        <div class="box" id="box1"></div>
+        <div class="box" id="box2"></div>
+        <div class="box" id="box3"></div>
+    </div>
+
+    <button onclick="startAnimation()">Запустити</button>
+    <button onclick="stopAnimation()">Зупинити</button>
+    <button onclick="resetAnimation()">Скинути</button>
+
+    <p id="status">Анімацію зупинено</p>
+
+    <script>
+        const boxes = [
+            document.getElementById("box1"),
+            document.getElementById("box2"),
+            document.getElementById("box3")
+        ];
+
+        let positions = [20, 20, 20];
+        let directions = [1, 1, 1];
+        let animationId = null;
+
+        function animate() {
+            const area = document.querySelector(".animation-area");
+            const maxPosition = area.clientWidth - boxes[0].offsetWidth;
+
+            for (let i = 0; i < boxes.length; i++) {
+                positions[i] += 3 * directions[i];
+
+                if (positions[i] >= maxPosition) {
+                    positions[i] = maxPosition;
+                    directions[i] = -1;
+                }
+
+                if (positions[i] <= 0) {
+                    positions[i] = 0;
+                    directions[i] = 1;
+                }
+
+                boxes[i].style.left = positions[i] + "px";
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function startAnimation() {
+            if (animationId === null) {
+                document.getElementById("status").textContent =
+                    "Анімація працює";
+
+                animate();
+            }
+        }
+
+        function stopAnimation() {
+            if (animationId !== null) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+
+            document.getElementById("status").textContent =
+                "Анімацію зупинено";
+        }
+
+        function resetAnimation() {
+            stopAnimation();
+
+            positions = [20, 20, 20];
+            directions = [1, 1, 1];
+
+            for (let i = 0; i < boxes.length; i++) {
+                boxes[i].style.left = "20px";
+            }
+
+            document.getElementById("status").textContent =
+                "Початкові позиції відновлено";
+        }
+    </script>
+
+</body>
+</html>
